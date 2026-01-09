@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureCheck | Password Breach Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Matrix Background Effect -->
+    <canvas id="matrix-bg"></canvas>
+    
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content terminal-window">
+            <div class="terminal-header">
+                <span class="terminal-title">┌──[AUTHENTICATION]</span>
+                <button class="close-btn" onclick="closeAuthModal()">×</button>
+            </div>
+            <div class="terminal-body">
+                <div id="login-form" class="auth-form">
+                    <h2 class="cyber-text">└─# ACCESS CONTROL</h2>
+                    <div class="input-group">
+                        <span class="prompt">root@securecheck:~$</span>
+                        <input type="email" id="login-email" placeholder="EMAIL_ADDRESS" class="cyber-input">
+                    </div>
+                    <div class="input-group">
+                        <span class="prompt">root@securecheck:~$</span>
+                        <input type="password" id="login-password" placeholder="PASSWORD" class="cyber-input">
+                    </div>
+                    <div class="remember-me-group">
+                        <label class="remember-me-label">
+                            <input type="checkbox" id="remember-me" class="remember-checkbox">
+                            <span class="remember-text">Remember me</span>
+                        </label>
+                    </div>
+                    <button onclick="login()" class="cyber-btn glow-btn">
+                        <span class="btn-text">[ AUTHENTICATE ]</span>
+                    </button>
+                    <div class="divider">
+                        <span class="divider-text">OR</span>
+                    </div>
+                    <button onclick="googleSignIn()" class="google-btn">
+                        <span class="google-icon">🔐</span>
+                        <span class="btn-text">SIGN IN WITH GOOGLE</span>
+                    </button>
+                    <p class="switch-auth">
+                        <span class="dim-text">New operator?</span>
+                        <a href="#" onclick="showSignup()">Register Access</a>
+                    </p>
+                </div>
+                
+                <div id="signup-form" class="auth-form" style="display: none;">
+                    <h2 class="cyber-text">└─# USER REGISTRATION</h2>
+                    <div class="input-group">
+                        <span class="prompt">root@securecheck:~$</span>
+                        <input type="email" id="signup-email" placeholder="EMAIL_ADDRESS" class="cyber-input">
+                    </div>
+                    <div class="input-group">
+                        <span class="prompt">root@securecheck:~$</span>
+                        <input type="password" id="signup-password" placeholder="PASSWORD" class="cyber-input">
+                    </div>
+                    <div class="input-group">
+                        <span class="prompt">root@securecheck:~$</span>
+                        <input type="password" id="signup-confirm" placeholder="CONFIRM_PASSWORD" class="cyber-input">
+                    </div>
+                    <button onclick="signup()" class="cyber-btn glow-btn">
+                        <span class="btn-text">[ REGISTER ]</span>
+                    </button>
+                    <div class="divider">
+                        <span class="divider-text">OR</span>
+                    </div>
+                    <button onclick="googleSignIn()" class="google-btn">
+                        <span class="google-icon">🔐</span>
+                        <span class="btn-text">SIGN UP WITH GOOGLE</span>
+                    </button>
+                    <p class="switch-auth">
+                        <span class="dim-text">Already registered?</span>
+                        <a href="#" onclick="showLogin()">Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-cube">
+                        <div class="cube-face front">🔒</div>
+                        <div class="cube-face back">🔓</div>
+                        <div class="cube-face left">⚠️</div>
+                        <div class="cube-face right">✓</div>
+                        <div class="cube-face top">🛡️</div>
+                        <div class="cube-face bottom">🔐</div>
+                    </div>
+                    <h1 class="site-title">
+                        <span class="title-line">SecureCheck</span>
+                        <span class="subtitle">PASSWORD_BREACH_SCANNER_V2.0</span>
+                    </h1>
+                </div>
+                <div class="user-section">
+                    <div class="theme-selector">
+                        <button onclick="toggleThemeMenu()" class="theme-btn" title="Change Theme">
+                            <span>🎨</span>
+                        </button>
+                        <div id="theme-menu" class="theme-menu" style="display: none;">
+                            <button onclick="changeTheme('green')" class="theme-option theme-green">Matrix Green</button>
+                            <button onclick="changeTheme('blue')" class="theme-option theme-blue">Cyber Blue</button>
+                            <button onclick="changeTheme('purple')" class="theme-option theme-purple">Neon Purple</button>
+                            <button onclick="changeTheme('red')" class="theme-option theme-red">Hacker Red</button>
+                            <button onclick="changeTheme('orange')" class="theme-option theme-orange">Amber Alert</button>
+                        </div>
+                    </div>
+                    <span id="user-email" class="user-info">user@system</span>
+                    <button onclick="deleteAccount()" class="delete-btn">[ DELETE ACCOUNT ]</button>
+                    <button onclick="logout()" class="logout-btn">[ DISCONNECT ]</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="grid-container">
+                <!-- Password Checker Section -->
+                <section class="terminal-window scanner-section">
+                    <div class="terminal-header">
+                        <span class="terminal-title">┌──[PASSWORD_SCANNER]</span>
+                        <div class="header-indicators">
+                            <span class="indicator red"></span>
+                            <span class="indicator yellow"></span>
+                            <span class="indicator green"></span>
+                        </div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="scanner-content">
+                            <p class="terminal-prompt">root@securecheck:~$ initiate_breach_scan</p>
+                            <div class="scan-interface">
+                                <div class="input-wrapper">
+                                    <span class="input-prefix">&gt;&gt;</span>
+                                    <input 
+                                        type="password" 
+                                        id="password-input" 
+                                        placeholder="ENTER_PASSWORD_TO_SCAN"
+                                        class="password-input"
+                                    >
+                                    <button id="toggle-visibility" class="visibility-toggle" onclick="togglePasswordVisibility()">
+                                        👁️
+                                    </button>
+                                </div>
+                                <button onclick="checkPassword()" class="scan-btn">
+                                    <span class="btn-icon">🔍</span>
+                                    <span class="btn-text">EXECUTE SCAN</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Result Display -->
+                            <div id="result-container" class="result-container" style="display: none;">
+                                <div id="result-content" class="result-content"></div>
+                            </div>
+                            
+                            <!-- Loading Animation -->
+                            <div id="loading" class="loading" style="display: none;">
+                                <div class="loader">
+                                    <div class="scan-line"></div>
+                                </div>
+                                <p class="loading-text">SCANNING DATABASE...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- History Section -->
+                <section class="terminal-window history-section">
+                    <div class="terminal-header">
+                        <span class="terminal-title">┌──[SCAN_HISTORY]</span>
+                        <button class="clear-history-btn" onclick="clearHistory()">[ CLEAR ]</button>
+                    </div>
+                    <div class="terminal-body">
+                        <div id="history-list" class="history-list">
+                            <p class="dim-text">No scan history available. Initiate a scan to begin.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Stats Section -->
+                <section class="terminal-window stats-section">
+                    <div class="terminal-header">
+                        <span class="terminal-title">┌──[SYSTEM_STATS]</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-value" id="total-scans">0</div>
+                                <div class="stat-label">TOTAL SCANS</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">⚠️</div>
+                                <div class="stat-value danger" id="pwned-count">0</div>
+                                <div class="stat-label">BREACHED</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✓</div>
+                                <div class="stat-value success" id="safe-count">0</div>
+                                <div class="stat-label">SECURE</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <p class="footer-text">
+                    <span class="dim-text">POWERED BY:</span> 
+                    <a href="https://haveibeenpwned.com/" target="_blank">HaveIBeenPwned API</a>
+                    <span class="separator">|</span>
+                    <span class="dim-text">STATUS:</span> 
+                    <span class="status-indicator">● ONLINE</span>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration (injected from backend) -->
+    <script>
+        window.FIREBASE_CONFIG = {
+            apiKey: "{{ firebase_config.apiKey }}",
+            authDomain: "{{ firebase_config.authDomain }}",
+            projectId: "{{ firebase_config.projectId }}",
+            storageBucket: "{{ firebase_config.storageBucket }}",
+            messagingSenderId: "{{ firebase_config.messagingSenderId }}",
+            appId: "{{ firebase_config.appId }}",
+            databaseURL: "{{ firebase_config.databaseURL }}"
+        };
+    </script>
+    
+    <!-- Main App Script -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
