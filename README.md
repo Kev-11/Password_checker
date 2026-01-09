@@ -2,6 +2,8 @@
 
 A **3D Kali Linux-themed** web application for checking passwords against known data breaches using the HaveIBeenPwned API. Features Firebase authentication, real-time history tracking, and a cyberpunk-inspired interface with matrix effects.
 
+🌐 **Live Demo**: [pwd-check-kev.vercel.app](https://pwd-check-kev.vercel.app)
+
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![Flask](https://img.shields.io/badge/flask-3.0.0-green.svg)
