@@ -8,6 +8,82 @@ const firebaseConfig = window.FIREBASE_CONFIG || {};
 // Initialize Firebase (will be done dynamically)
 let app, auth, database;
 
+// ============================================
+// SESSION TIMEOUT MANAGEMENT
+// ============================================
+
+let inactivityTimer = null;
+const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes in milliseconds
+
+// Check if Remember Me is enabled
+function isRememberMeEnabled() {
+    return localStorage.getItem('rememberedEmail') !== null;
+}
+
+// Reset inactivity timer
+function resetInactivityTimer() {
+    // Don't apply timeout if Remember Me is enabled
+    if (isRememberMeEnabled()) {
+        return;
+    }
+
+    // Clear existing timer
+    if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+    }
+
+    // Set new timer
+    inactivityTimer = setTimeout(() => {
+        autoLogout();
+    }, INACTIVITY_TIMEOUT);
+}
+
+// Auto logout due to inactivity
+function autoLogout() {
+    if (auth && auth.currentUser) {
+        auth.signOut().then(() => {
+            showNotification('Session expired due to inactivity', 'warning');
+            // Clear timer
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = null;
+            }
+        });
+    }
+}
+
+// Start tracking user activity
+function startActivityTracking() {
+    // Don't track if Remember Me is enabled
+    if (isRememberMeEnabled()) {
+        return;
+    }
+
+    // Start initial timer
+    resetInactivityTimer();
+
+    // Track user activity events
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    activityEvents.forEach(event => {
+        document.addEventListener(event, resetInactivityTimer, true);
+    });
+}
+
+// Stop tracking user activity
+function stopActivityTracking() {
+    if (inactivityTimer) {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = null;
+    }
+
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    activityEvents.forEach(event => {
+        document.removeEventListener(event, resetInactivityTimer, true);
+    });
+}
+
 // Initialize Firebase when DOM loads
 function initializeFirebase() {
     try {
@@ -101,6 +177,9 @@ function showMainApp(user) {
     document.getElementById('auth-modal').style.display = 'none';
     document.getElementById('app-container').style.display = 'flex';
     document.getElementById('user-email').textContent = user.email;
+    
+    // Start activity tracking for session timeout
+    startActivityTracking();
 }
 
 // Switch between login and signup forms
@@ -180,6 +259,9 @@ async function signup() {
 
 // Logout function
 async function logout() {
+    // Stop activity tracking
+    stopActivityTracking();
+    
     try {
         await auth.signOut();
         showNotification('Logged out successfully', 'success');
