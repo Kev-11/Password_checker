@@ -295,11 +295,6 @@ python -c "import secrets; print(secrets.token_hex(32))"
 
 ### Check Logs
 Press **F12** in browser → Console tab to see error
-## 📚 Additional Documentation
-
-- [SETUP.md](SETUP.md) - Detailed setup instructions
-- [FIREBASE_SETUP.md](FIREBASE_SETUP.md) - Firebase configuration guide
-- [FIREBASE_DATABASE.md](FIREBASE_DATABASE.md) - Database structure and rules
 
 ## 🤝 Contributing
 
@@ -348,7 +343,7 @@ Having issues? Check these resources:
 
 **⚠️ Disclaimer:** This tool is for educational and security awareness purposes. Always use strong, unique passwords for each account. Consider using a reputable password manager.
 
-**Made with 💚 and ☕ by Kevin Patel**
+**Made with 🐍 and ☕ by Kevin Patel**
 
 🌟 If you find this project useful, please consider giving it a star!
 � Support
