@@ -1862,3 +1862,178 @@ input[type="range"]::-moz-range-thumb {
         font-size: 12px;
     }
 }
+
+/* ============================================
+   SECURITY INFORMATION SECTION
+   ============================================ */
+
+.security-info-section {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-main {
+    margin-bottom: 40px;
+}
+
+.info-title {
+    color: var(--primary-color);
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Courier New', monospace;
+    text-shadow: var(--glow-primary);
+}
+
+.info-description {
+    color: var(--text-primary);
+    font-size: 16px;
+    line-height: 1.8;
+    margin-bottom: 15px;
+    font-family: 'Courier New', monospace;
+}
+
+.info-highlight {
+    padding: 15px;
+    background: rgba(0, 255, 65, 0.05);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.info-highlight p {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.nist-link {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: bold;
+    border-bottom: 1px dashed var(--secondary-color);
+    transition: all 0.3s ease;
+}
+
+.nist-link:hover {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    text-shadow: var(--glow-primary);
+}
+
+.info-dangers {
+    margin-top: 40px;
+}
+
+.danger-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.danger-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.danger-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.danger-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    transform: translateY(-5px);
+}
+
+.danger-card:hover::before {
+    opacity: 1;
+}
+
+.danger-icon {
+    font-size: 36px;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 10px var(--primary-color));
+}
+
+.danger-title {
+    color: var(--secondary-color);
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Courier New', monospace;
+}
+
+.danger-description {
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.7;
+    font-family: 'Courier New', monospace;
+    opacity: 0.9;
+}
+
+/* Responsive design for info section */
+@media (max-width: 768px) {
+    .danger-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-title {
+        font-size: 20px;
+    }
+    
+    .info-description {
+        font-size: 14px;
+    }
+    
+    .danger-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .security-info-section {
+        margin-top: 30px;
+        padding-top: 20px;
+    }
+    
+    .info-title {
+        font-size: 18px;
+    }
+    
+    .info-description {
+        font-size: 13px;
+    }
+    
+    .danger-icon {
+        font-size: 28px;
+    }
+    
+    .danger-title {
+        font-size: 16px;
+    }
+    
+    .danger-description {
+        font-size: 13px;
+    }
+}
