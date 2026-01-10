@@ -57,8 +57,21 @@
                     </div>
                     <div class="input-group">
                         <span class="prompt">root@securecheck:~$</span>
-                        <input type="password" id="signup-password" placeholder="PASSWORD" class="cyber-input">
+                        <input type="password" id="signup-password" placeholder="PASSWORD" class="cyber-input" oninput="checkSignupPasswordStrength()">
                     </div>
+                    
+                    <!-- Password Strength Meter for Signup -->
+                    <div id="signup-strength-meter" class="strength-meter" style="display: none;">
+                        <div class="strength-bar-container">
+                            <div id="signup-strength-bar" class="strength-bar"></div>
+                        </div>
+                        <div class="strength-info">
+                            <span id="signup-strength-label" class="strength-label">WEAK</span>
+                            <span id="signup-strength-percent" class="strength-percent">0%</span>
+                        </div>
+                        <div id="signup-strength-suggestions" class="strength-suggestions"></div>
+                    </div>
+                    
                     <div class="input-group">
                         <span class="prompt">root@securecheck:~$</span>
                         <input type="password" id="signup-confirm" placeholder="CONFIRM_PASSWORD" class="cyber-input">
@@ -167,6 +180,139 @@
                                     <div class="scan-line"></div>
                                 </div>
                                 <p class="loading-text">SCANNING DATABASE...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Password Strength Analyzer Section -->
+                <section class="terminal-window strength-section">
+                    <div class="terminal-header">
+                        <span class="terminal-title">┌──[PASSWORD_STRENGTH_ANALYZER]</span>
+                        <div class="header-indicators">
+                            <span class="indicator red"></span>
+                            <span class="indicator yellow"></span>
+                            <span class="indicator green"></span>
+                        </div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="strength-analyzer-content">
+                            <p class="terminal-prompt">root@securecheck:~$ analyze_password_strength</p>
+                            
+                            <div class="analyzer-interface">
+                                <div class="input-wrapper">
+                                    <span class="input-prefix">&gt;&gt;</span>
+                                    <input 
+                                        type="password" 
+                                        id="strength-password-input" 
+                                        placeholder="ENTER_PASSWORD_TO_ANALYZE"
+                                        class="password-input"
+                                        oninput="analyzePasswordStrength()"
+                                    >
+                                    <button id="strength-toggle-visibility" class="visibility-toggle" onclick="toggleStrengthPasswordVisibility()">
+                                        👁️
+                                    </button>
+                                </div>
+                                <button onclick="analyzeAndSave()" class="scan-btn">
+                                    <span class="btn-icon">📊</span>
+                                    <span class="btn-text">ANALYZE & SAVE</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Strength Analysis Display -->
+                            <div id="strength-analysis" class="strength-analysis" style="display: none;">
+                                <!-- Strength Meter -->
+                                <div class="strength-meter-main">
+                                    <div class="meter-header">
+                                        <span class="meter-title">[STRENGTH ANALYSIS]</span>
+                                        <span id="strength-score-display" class="strength-score">0%</span>
+                                    </div>
+                                    <div class="strength-bar-container-main">
+                                        <div id="strength-bar-main" class="strength-bar-main"></div>
+                                    </div>
+                                    <div class="strength-level-display">
+                                        <span id="strength-level-main" class="strength-level">VERY WEAK</span>
+                                        <span id="crack-time-display" class="crack-time">Crack time: Instant</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Criteria Checklist -->
+                                <div class="criteria-checklist">
+                                    <div class="criteria-title">&gt;&gt; Requirements:</div>
+                                    <div id="criteria-list" class="criteria-items"></div>
+                                </div>
+                                
+                                <!-- Suggestions -->
+                                <div id="strength-suggestions-main" class="suggestions-panel">
+                                    <div class="suggestions-title">&gt;&gt; Suggestions:</div>
+                                    <div id="suggestions-list" class="suggestions-items"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Password Generator Section -->
+                <section class="terminal-window generator-section">
+                    <div class="terminal-header">
+                        <span class="terminal-title">┌──[PASSWORD_GENERATOR]</span>
+                        <div class="header-indicators">
+                            <span class="indicator red"></span>
+                            <span class="indicator yellow"></span>
+                            <span class="indicator green"></span>
+                        </div>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="generator-content">
+                            <p class="terminal-prompt">root@securecheck:~$ generate_secure_password</p>
+                            
+                            <!-- Generator Controls -->
+                            <div class="generator-controls">
+                                <div class="control-group">
+                                    <label class="control-label">Length: <span id="length-value">16</span></label>
+                                    <input type="range" id="password-length" min="8" max="32" value="16" oninput="updateLengthDisplay()">
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-checkbox">
+                                        <input type="checkbox" id="include-uppercase" checked>
+                                        <span>Uppercase (A-Z)</span>
+                                    </label>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-checkbox">
+                                        <input type="checkbox" id="include-lowercase" checked>
+                                        <span>Lowercase (a-z)</span>
+                                    </label>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-checkbox">
+                                        <input type="checkbox" id="include-numbers" checked>
+                                        <span>Numbers (0-9)</span>
+                                    </label>
+                                </div>
+                                <div class="control-group">
+                                    <label class="control-checkbox">
+                                        <input type="checkbox" id="include-symbols" checked>
+                                        <span>Symbols (!@#$%)</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button onclick="generatePassword()" class="scan-btn">
+                                <span class="btn-icon">🎲</span>
+                                <span class="btn-text">GENERATE PASSWORD</span>
+                            </button>
+                            
+                            <!-- Generated Password Display -->
+                            <div id="generated-password-container" class="generated-password-container" style="display: none;">
+                                <div class="generated-password-display">
+                                    <span class="generated-label">&gt;&gt; Generated:</span>
+                                    <code id="generated-password" class="generated-password"></code>
+                                    <button onclick="copyGeneratedPassword()" class="copy-btn" title="Copy to clipboard">
+                                        📋
+                                    </button>
+                                </div>
+                                <div id="generated-strength" class="generated-strength-info"></div>
                             </div>
                         </div>
                     </div>

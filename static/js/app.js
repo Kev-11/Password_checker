@@ -248,6 +248,13 @@ async function signup() {
         return;
     }
 
+    // Enforce minimum Medium (Fair) strength requirement
+    const { score, level } = calculatePasswordStrength(password);
+    if (score < 41) {
+        showNotification(`Password is too weak (${level}). Please use a stronger password (minimum: FAIR)`, 'error');
+        return;
+    }
+
     try {
         await auth.createUserWithEmailAndPassword(email, password);
         showNotification('Account created successfully!', 'success');
@@ -703,6 +710,399 @@ document.addEventListener('click', (e) => {
         menu.style.display = 'none';
     }
 });
+
+// ============================================
+// PASSWORD STRENGTH ANALYZER
+// ============================================
+
+// Common password patterns and weak passwords
+const COMMON_PASSWORDS = [
+    'password', '123456', '12345678', 'qwerty', 'abc123', 'monkey', '1234567',
+    'letmein', 'trustno1', 'dragon', 'baseball', 'iloveyou', 'master', 'sunshine',
+    'ashley', 'bailey', 'passw0rd', 'shadow', '123123', '654321', 'superman',
+    'qazwsx', 'michael', 'football', 'welcome', 'jesus', 'ninja', 'mustang'
+];
+
+const COMMON_PATTERNS = [
+    /^(.)\1+$/, // Repeated characters (aaa, 111)
+    /^(012|123|234|345|456|567|678|789|890|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)+$/i, // Sequential
+    /^[a-z]+$/i, // Only letters
+    /^[0-9]+$/, // Only numbers
+    /^(19|20)\d{2}$/ // Years
+];
+
+// Dictionary of common words (simplified)
+const DICTIONARY_WORDS = [
+    'admin', 'user', 'login', 'access', 'system', 'computer', 'internet',
+    'welcome', 'hello', 'world', 'secret', 'private', 'secure', 'pass'
+];
+
+// Calculate password strength (0-100)
+function calculatePasswordStrength(password) {
+    if (!password) return { score: 0, level: 'VERY WEAK', feedback: [] };
+    
+    let score = 0;
+    const feedback = [];
+    const criteria = {
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        numbers: false,
+        symbols: false,
+        noCommon: false,
+        noPatterns: false,
+        noDictionary: false
+    };
+    
+    // Length check (25 points max)
+    if (password.length >= 8) {
+        criteria.length = true;
+        score += 10;
+        if (password.length >= 12) score += 5;
+        if (password.length >= 16) score += 5;
+        if (password.length >= 20) score += 5;
+    } else {
+        feedback.push('Use at least 8 characters (12+ recommended)');
+    }
+    
+    // Character variety (40 points max - 10 each)
+    if (/[A-Z]/.test(password)) {
+        criteria.uppercase = true;
+        score += 10;
+    } else {
+        feedback.push('Add uppercase letters (A-Z)');
+    }
+    
+    if (/[a-z]/.test(password)) {
+        criteria.lowercase = true;
+        score += 10;
+    } else {
+        feedback.push('Add lowercase letters (a-z)');
+    }
+    
+    if (/[0-9]/.test(password)) {
+        criteria.numbers = true;
+        score += 10;
+    } else {
+        feedback.push('Add numbers (0-9)');
+    }
+    
+    if (/[^A-Za-z0-9]/.test(password)) {
+        criteria.symbols = true;
+        score += 10;
+    } else {
+        feedback.push('Add special symbols (!@#$%^&*)');
+    }
+    
+    // Check for common passwords (15 points)
+    const lowerPassword = password.toLowerCase();
+    let isCommon = COMMON_PASSWORDS.some(common => lowerPassword.includes(common));
+    if (!isCommon) {
+        criteria.noCommon = true;
+        score += 15;
+    } else {
+        feedback.push('Avoid common passwords');
+        score = Math.min(score, 40); // Cap at Fair if common password detected
+    }
+    
+    // Check for patterns (10 points)
+    let hasPattern = COMMON_PATTERNS.some(pattern => pattern.test(password));
+    if (!hasPattern) {
+        criteria.noPatterns = true;
+        score += 10;
+    } else {
+        feedback.push('Avoid sequential or repeated characters');
+    }
+    
+    // Check for dictionary words (10 points)
+    let hasDictionaryWord = DICTIONARY_WORDS.some(word => lowerPassword.includes(word));
+    if (!hasDictionaryWord) {
+        criteria.noDictionary = true;
+        score += 10;
+    } else {
+        feedback.push('Avoid common dictionary words');
+    }
+    
+    // Determine strength level
+    let level;
+    if (score <= 20) level = 'VERY WEAK';
+    else if (score <= 40) level = 'WEAK';
+    else if (score <= 60) level = 'FAIR';
+    else if (score <= 80) level = 'GOOD';
+    else level = 'VERY STRONG';
+    
+    return { score, level, feedback, criteria };
+}
+
+// Estimate crack time
+function estimateCrackTime(password) {
+    const length = password.length;
+    let charset = 0;
+    
+    if (/[a-z]/.test(password)) charset += 26;
+    if (/[A-Z]/.test(password)) charset += 26;
+    if (/[0-9]/.test(password)) charset += 10;
+    if (/[^A-Za-z0-9]/.test(password)) charset += 32;
+    
+    // Approximate combinations
+    const combinations = Math.pow(charset, length);
+    
+    // Assume 1 billion guesses per second (modern GPU)
+    const secondsToCrack = combinations / 1000000000;
+    
+    if (secondsToCrack < 1) return 'Instant';
+    if (secondsToCrack < 60) return `${Math.ceil(secondsToCrack)} seconds`;
+    if (secondsToCrack < 3600) return `${Math.ceil(secondsToCrack / 60)} minutes`;
+    if (secondsToCrack < 86400) return `${Math.ceil(secondsToCrack / 3600)} hours`;
+    if (secondsToCrack < 2592000) return `${Math.ceil(secondsToCrack / 86400)} days`;
+    if (secondsToCrack < 31536000) return `${Math.ceil(secondsToCrack / 2592000)} months`;
+    return `${Math.ceil(secondsToCrack / 31536000)} years`;
+}
+
+// Signup password strength checker
+function checkSignupPasswordStrength() {
+    const passwordInput = document.getElementById('signup-password');
+    const strengthMeter = document.getElementById('signup-strength-meter');
+    const strengthBar = document.getElementById('signup-strength-bar');
+    const strengthLabel = document.getElementById('signup-strength-label');
+    const strengthPercent = document.getElementById('signup-strength-percent');
+    const strengthSuggestions = document.getElementById('signup-strength-suggestions');
+    
+    if (!passwordInput || !strengthMeter) return;
+    
+    const password = passwordInput.value;
+    
+    if (!password) {
+        strengthMeter.style.display = 'none';
+        return;
+    }
+    
+    strengthMeter.style.display = 'block';
+    
+    const { score, level, feedback } = calculatePasswordStrength(password);
+    
+    // Update bar
+    strengthBar.className = 'strength-bar ' + level.toLowerCase().replace(' ', '-');
+    
+    // Update label and percent
+    strengthLabel.textContent = level;
+    strengthLabel.className = level.toLowerCase().replace(' ', '-');
+    strengthPercent.textContent = score + '%';
+    
+    // Update suggestions
+    if (feedback.length > 0) {
+        strengthSuggestions.innerHTML = '<ul>' + 
+            feedback.map(f => `<li>${f}</li>`).join('') + 
+            '</ul>';
+    } else {
+        strengthSuggestions.innerHTML = '<span style="color: var(--primary-color);">✓ Excellent password!</span>';
+    }
+}
+
+// Main password strength analyzer
+function analyzePasswordStrength() {
+    const passwordInput = document.getElementById('strength-password-input');
+    const analysisDiv = document.getElementById('strength-analysis');
+    
+    if (!passwordInput || !analysisDiv) return;
+    
+    const password = passwordInput.value;
+    
+    if (!password) {
+        analysisDiv.style.display = 'none';
+        return;
+    }
+    
+    analysisDiv.style.display = 'block';
+    
+    const { score, level, feedback, criteria } = calculatePasswordStrength(password);
+    const crackTime = estimateCrackTime(password);
+    
+    // Update main strength bar
+    const strengthBar = document.getElementById('strength-bar-main');
+    const strengthScore = document.getElementById('strength-score-display');
+    const strengthLevel = document.getElementById('strength-level-main');
+    const crackTimeDisplay = document.getElementById('crack-time-display');
+    
+    strengthBar.className = 'strength-bar-main ' + level.toLowerCase().replace(' ', '-');
+    strengthScore.textContent = score + '%';
+    strengthLevel.textContent = level;
+    strengthLevel.className = 'strength-level ' + level.toLowerCase().replace(' ', '-');
+    crackTimeDisplay.textContent = 'Crack time: ' + crackTime;
+    
+    // Update criteria checklist
+    const criteriaList = document.getElementById('criteria-list');
+    criteriaList.innerHTML = `
+        <div class="criterion ${criteria.length ? 'met' : 'unmet'}">
+            <span class="criterion-icon">${criteria.length ? '✓' : '✗'}</span>
+            <span>8+ characters</span>
+        </div>
+        <div class="criterion ${criteria.uppercase ? 'met' : 'unmet'}">
+            <span class="criterion-icon">${criteria.uppercase ? '✓' : '✗'}</span>
+            <span>Uppercase letters</span>
+        </div>
+        <div class="criterion ${criteria.lowercase ? 'met' : 'unmet'}">
+            <span class="criterion-icon">${criteria.lowercase ? '✓' : '✗'}</span>
+            <span>Lowercase letters</span>
+        </div>
+        <div class="criterion ${criteria.numbers ? 'met' : 'unmet'}">
+            <span class="criterion-icon">${criteria.numbers ? '✓' : '✗'}</span>
+            <span>Numbers</span>
+        </div>
+        <div class="criterion ${criteria.symbols ? 'met' : 'unmet'}">
+            <span class="criterion-icon">${criteria.symbols ? '✓' : '✗'}</span>
+            <span>Special characters</span>
+        </div>
+        <div class="criterion ${criteria.noCommon ? 'met' : 'unmet'}">
+            <span class="criterion-icon">${criteria.noCommon ? '✓' : '✗'}</span>
+            <span>Not common password</span>
+        </div>
+        <div class="criterion ${criteria.noPatterns ? 'met' : 'unmet'}">
+            <span class="criterion-icon">${criteria.noPatterns ? '✓' : '✗'}</span>
+            <span>No patterns</span>
+        </div>
+        <div class="criterion ${criteria.noDictionary ? 'met' : 'unmet'}">
+            <span class="criterion-icon">${criteria.noDictionary ? '✓' : '✗'}</span>
+            <span>No dictionary words</span>
+        </div>
+    `;
+    
+    // Update suggestions
+    const suggestionsDiv = document.getElementById('strength-suggestions-main');
+    const suggestionsList = document.getElementById('suggestions-list');
+    
+    if (feedback.length > 0) {
+        suggestionsDiv.style.display = 'block';
+        suggestionsList.innerHTML = feedback.map(f => 
+            `<div class="suggestion-item">${f}</div>`
+        ).join('');
+    } else {
+        suggestionsDiv.style.display = 'none';
+    }
+}
+
+// Analyze and save to history
+async function analyzeAndSave() {
+    const passwordInput = document.getElementById('strength-password-input');
+    const password = passwordInput.value;
+    
+    if (!password) {
+        showNotification('Please enter a password to analyze', 'warning');
+        return;
+    }
+    
+    // Trigger analysis
+    analyzePasswordStrength();
+    
+    // Save to Firebase history
+    if (auth && auth.currentUser && database) {
+        try {
+            const { score, level } = calculatePasswordStrength(password);
+            const crackTime = estimateCrackTime(password);
+            
+            const historyRef = ref(database, `users/${auth.currentUser.uid}/strength_history`);
+            const newEntryRef = push(historyRef);
+            
+            await set(newEntryRef, {
+                timestamp: Date.now(),
+                strength_level: level,
+                strength_score: score,
+                crack_time: crackTime,
+                password_length: password.length
+            });
+            
+            showNotification('Password analyzed and saved to history!', 'success');
+        } catch (error) {
+            console.error('Error saving to history:', error);
+            showNotification('Password analyzed (not saved - Firebase error)', 'warning');
+        }
+    } else {
+        showNotification('Password analyzed!', 'success');
+    }
+}
+
+// Toggle password visibility in strength analyzer
+function toggleStrengthPasswordVisibility() {
+    const passwordInput = document.getElementById('strength-password-input');
+    const toggleBtn = document.getElementById('strength-toggle-visibility');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleBtn.textContent = '🙈';
+    } else {
+        passwordInput.type = 'password';
+        toggleBtn.textContent = '👁️';
+    }
+}
+
+// Password generator
+function generatePassword() {
+    const length = parseInt(document.getElementById('password-length').value);
+    const includeUppercase = document.getElementById('include-uppercase').checked;
+    const includeLowercase = document.getElementById('include-lowercase').checked;
+    const includeNumbers = document.getElementById('include-numbers').checked;
+    const includeSymbols = document.getElementById('include-symbols').checked;
+    
+    // Validate at least one type is selected
+    if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSymbols) {
+        showNotification('Please select at least one character type', 'warning');
+        return;
+    }
+    
+    let charset = '';
+    if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+    if (includeNumbers) charset += '0123456789';
+    if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+    
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    
+    // Display generated password
+    const container = document.getElementById('generated-password-container');
+    const passwordDisplay = document.getElementById('generated-password');
+    const strengthInfo = document.getElementById('generated-strength');
+    
+    container.style.display = 'block';
+    passwordDisplay.textContent = password;
+    
+    // Analyze generated password
+    const { score, level } = calculatePasswordStrength(password);
+    const crackTime = estimateCrackTime(password);
+    
+    strengthInfo.innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span style="color: var(--primary-color); font-weight: bold;">Strength: ${level}</span>
+            <span style="color: var(--text-dim);">${score}%</span>
+        </div>
+        <div style="color: var(--text-dim); font-size: 12px;">
+            Estimated crack time: ${crackTime}
+        </div>
+    `;
+    
+    showNotification('Password generated successfully!', 'success');
+}
+
+// Copy generated password
+function copyGeneratedPassword() {
+    const passwordDisplay = document.getElementById('generated-password');
+    const password = passwordDisplay.textContent;
+    
+    navigator.clipboard.writeText(password).then(() => {
+        showNotification('Password copied to clipboard!', 'success');
+    }).catch(() => {
+        showNotification('Failed to copy password', 'error');
+    });
+}
+
+// Update length display
+function updateLengthDisplay() {
+    const lengthInput = document.getElementById('password-length');
+    const lengthValue = document.getElementById('length-value');
+    lengthValue.textContent = lengthInput.value;
+}
 
 // ============================================
 // INITIALIZATION

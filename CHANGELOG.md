@@ -4,6 +4,79 @@ All notable changes to this project.
 
 ---
 
+## [3.0.0] - 2026-01-11
+
+### ✨ Added - Password Strength Checker
+
+#### 💪 Comprehensive Strength Analysis
+- **5-Level Scoring System**: Very Weak (0-20%), Weak (21-40%), Fair (41-60%), Good (61-80%), Very Strong (81-100%)
+- **100-Point Algorithm**: 
+  - Length scoring (25pts): 8+, 12+, 16+, 20+ character tiers
+  - Character variety (40pts): Uppercase, lowercase, numbers, symbols
+  - Pattern detection (25pts): Common passwords, sequential/repeated characters
+  - Dictionary check (10pts): Common word detection
+- **8 Criteria Checklist**: Visual feedback for each requirement
+- **Real-time Suggestions**: Contextual improvement tips as user types
+- **Crack Time Estimation**: Shows estimated time to crack (instant to years)
+
+#### 🎯 Signup Integration
+- **Live Strength Meter**: Appears as user types password in signup form
+- **Visual Feedback**: Animated bar with color-coding and glow effects
+- **Minimum Enforcement**: Requires FAIR (41%+) strength to create account
+- **Inline Suggestions**: Lists missing requirements to improve password
+
+#### 📊 Main Password Analyzer
+- **Dedicated Section**: Separate page in main app for in-depth analysis
+- **Password Visibility Toggle**: Show/hide password with 👁️ button
+- **Animated Meter**: Gradient bar with shimmer animation effect
+- **Detailed Breakdown**: Score percentage, level, crack time, full criteria
+- **Save to History**: Store analysis results in Firebase (metadata only)
+- **Suggestion Panel**: Highlighted improvement recommendations
+
+#### 🎲 Secure Password Generator
+- **Separate Section**: Independent tool below strength analyzer
+- **Customizable Options**:
+  - Length slider: 8-32 characters
+  - Character types: Uppercase, lowercase, numbers, symbols
+- **One-click Generation**: Instant secure password creation
+- **Auto-analysis**: Generated password strength shown immediately
+- **Copy to Clipboard**: Quick copy button with feedback
+- **Strength Display**: Shows level, score, and crack time
+
+#### 🎨 Cyberpunk Styling
+- **Theme Integration**: Works with all 5 app themes
+- **Animated Strength Bars**: Gradient fills with glow and shimmer effects
+- **Terminal Aesthetics**: Matches existing Kali Linux interface
+- **Color-coded Levels**: Red→Orange→Yellow→Blue→Green progression
+- **Responsive Design**: Mobile-optimized layouts and controls
+
+#### 🔒 Security Features
+- **Client-side Processing**: No passwords sent to server
+- **Metadata Only**: History stores score/level, not actual passwords
+- **Privacy First**: Analysis happens entirely in browser
+- **Signup Protection**: Prevents weak password account creation
+
+**Files Modified:**
+- `templates/index.html` - Added strength meter, analyzer section, generator section
+- `static/css/style.css` - Added 500+ lines of strength checker styles
+- `static/js/app.js` - Added strength calculation, generator, validation functions
+
+**Files Added:**
+- `STRENGTH_CHECKER_GUIDE.md` - Complete feature documentation (22 sections)
+
+**New Functions:**
+- `calculatePasswordStrength(password)` - Core 100-point scoring algorithm
+- `estimateCrackTime(password)` - Time-to-crack calculation
+- `checkSignupPasswordStrength()` - Real-time signup validation
+- `analyzePasswordStrength()` - Main analyzer with full display
+- `analyzeAndSave()` - Save analysis to Firebase history
+- `generatePassword()` - Secure random password creation
+- `toggleStrengthPasswordVisibility()` - Show/hide password toggle
+- `copyGeneratedPassword()` - Clipboard copy with notification
+- `updateLengthDisplay()` - Length slider value display
+
+---
+
 ## [2.1.0] - 2026-01-10
 
 ### 🔄 Changed

@@ -15,7 +15,10 @@ A **3D Kali Linux-themed** web application for checking passwords against known 
 - 🔐 **Firebase Authentication** - Email/Password + Google Sign-In
 - 📊 **Real-time Database** - Store and track password check history
 - 🔍 **Password Breach Detection** - Check against 10+ billion pwned passwords
-- 📈 **Statistics Dashboard** - Track total scans, breached, and secure passwords
+- � **Password Strength Analyzer** - 5-level scoring with real-time suggestions
+- 🎲 **Secure Password Generator** - Customizable with instant strength analysis
+- ⏱️ **Crack Time Estimation** - See how long it would take to crack your password
+- �📈 **Statistics Dashboard** - Track total scans, breached, and secure passwords
 - 🎭 **Animated UI** - 3D rotating cube logo, matrix rain effect, glowing effects
 - 📱 **Responsive Design** - Works on desktop, tablet, and mobile devices
 - 🛡️ **Privacy First** - Passwords are never stored, only check results
@@ -101,26 +104,27 @@ Your theme preference is saved automatically in browser storage!
 
 ```
 Password_checker/
-├── venv/                      # Virtual environment
+├── venv/                           # Virtual environment
 ├── static/
 │   ├── css/
-│   │   └── style.css         # 3D Kali-themed styles (5 themes)
+│   │   └── style.css              # 3D Kali-themed styles (5 themes)
 │   └── js/
-│       └── app.js            # Firebase & interactions
+│       └── app.js                 # Firebase & interactions
 ├── templates/
-│   └── index.html            # Main UI template
-├── app.py                    # Flask backend server
-├── requirements.txt          # Python dependencies
-├── vercel.json               # Vercel deployment config
-├── setup.bat                 # Windows setup script
-├── setup.sh                  # Mac/Linux setup script
-├── .env                      # Environment variables (not in Git)
-├── .env.example              # Environment template
-├── .gitignore                # Git ignore rules
-├── README.md                 # This file
-├── QUICKSTART.md             # 5-minute setup guide
-├── DEPLOYMENT.md             # Vercel deployment guide
-└── CHANGELOG.md              # Version history
+│   └── index.html                 # Main UI template
+├── app.py                         # Flask backend server
+├── requirements.txt               # Python dependencies
+├── vercel.json                    # Vercel deployment config
+├── setup.bat                      # Windows setup script
+├── setup.sh                       # Mac/Linux setup script
+├── .env                           # Environment variables (not in Git)
+├── .env.example                   # Environment template
+├── .gitignore                     # Git ignore rules
+├── README.md                      # This file
+├── QUICKSTART.md                  # 5-minute setup guide
+├── DEPLOYMENT.md                  # Vercel deployment guide
+├── STRENGTH_CHECKER_GUIDE.md      # Password strength feature guide
+└── CHANGELOG.md                   # Version history
 ```
 
 ## 🔧 Configuration
