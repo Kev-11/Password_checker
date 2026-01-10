@@ -1106,25 +1106,168 @@ body {
 }
 
 @media (max-width: 768px) {
+    /* Modal adjustments */
+    .modal-content {
+        width: 95%;
+        max-width: 95%;
+        margin: 10px;
+        padding: 0;
+    }
+    
+    .terminal-body {
+        padding: 20px 15px;
+    }
+    
+    /* Input group adjustments for mobile */
+    .input-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .prompt {
+        font-size: 11px;
+    }
+    
+    .cyber-input {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    
+    /* Header adjustments */
     .header-content {
         flex-direction: column;
         gap: 20px;
+        padding: 15px 10px;
     }
     
     .logo-section {
         flex-direction: column;
+        gap: 10px;
     }
     
     .title-line {
-        font-size: 24px;
+        font-size: 20px;
     }
     
+    .subtitle {
+        font-size: 10px;
+    }
+    
+    /* User section on mobile */
+    .user-section {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .user-info {
+        font-size: 12px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .theme-btn,
+    .delete-btn,
+    .logout-btn {
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+    
+    /* Main content adjustments */
     .main-content {
-        padding: 20px 15px;
+        padding: 15px 10px;
     }
     
+    /* Stats grid */
     .stats-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* Buttons */
+    .cyber-btn,
+    .google-btn {
+        padding: 12px;
+        font-size: 14px;
+    }
+    
+    /* Theme menu positioning */
+    .theme-menu {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Extra small devices */
+    .modal-content {
+        width: 98%;
+        margin: 5px;
+    }
+    
+    .terminal-body {
+        padding: 15px 10px;
+    }
+    
+    .cyber-text {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .input-group {
+        margin-bottom: 12px;
+    }
+    
+    .cyber-input {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .cyber-btn,
+    .google-btn {
+        padding: 12px 10px;
+        font-size: 13px;
+    }
+    
+    .title-line {
+        font-size: 18px;
+    }
+    
+    .logo-cube {
+        width: 50px;
+        height: 50px;
+    }
+    
+    /* History items */
+    .history-item {
+        padding: 12px;
+        font-size: 12px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+    }
+}
+
+/* Landscape mobile orientation */
+@media (max-width: 768px) and (orientation: landscape) {
+    .modal-content {
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    
+    .terminal-body {
+        padding: 15px;
     }
 }
 
