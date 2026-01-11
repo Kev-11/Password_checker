@@ -156,6 +156,7 @@ function checkAuthState() {
             // User is signed in
             showMainApp(user);
             loadUserHistory(user.uid);
+            loadStrengthHistory(user.uid);
         } else {
             // User is signed out
             showAuthModal();
@@ -528,6 +529,81 @@ async function clearHistory() {
         } catch (error) {
             console.error('Error clearing history:', error);
             showNotification('Error clearing history', 'error');
+        }
+    }
+}
+
+// Load strength analysis history
+async function loadStrengthHistory(userId) {
+    try {
+        const historyRef = database.ref(`users/${userId}/strength_history`).orderByChild('timestamp').limitToLast(20);
+        
+        historyRef.on('value', (snapshot) => {
+            const historyList = document.getElementById('strength-history-list');
+            historyList.innerHTML = '';
+
+            const data = snapshot.val();
+            
+            if (!data) {
+                historyList.innerHTML = '<p class="dim-text">No strength analysis history. Analyze passwords to begin.</p>';
+                return;
+            }
+
+            const historyArray = Object.entries(data).reverse();
+
+            historyArray.forEach(([key, item]) => {
+                const historyItem = document.createElement('div');
+                const levelClass = item.strength_level.toLowerCase().replace(' ', '-');
+                historyItem.className = `strength-history-item ${levelClass}`;
+                
+                const date = new Date(item.timestamp);
+                const formattedDate = date.toLocaleString();
+
+                historyItem.innerHTML = `
+                    <div class="strength-history-header">
+                        <span class="strength-history-level">${item.strength_level}</span>
+                        <span class="strength-history-score">${item.strength_score}%</span>
+                    </div>
+                    <div class="strength-history-details">
+                        <div class="strength-history-detail">
+                            <span class="strength-history-detail-label">Date & Time</span>
+                            <span class="strength-history-detail-value strength-history-timestamp">${formattedDate}</span>
+                        </div>
+                        <div class="strength-history-detail">
+                            <span class="strength-history-detail-label">Crack Time</span>
+                            <span class="strength-history-detail-value">${item.crack_time}</span>
+                        </div>
+                        <div class="strength-history-detail">
+                            <span class="strength-history-detail-label">Password Length</span>
+                            <span class="strength-history-detail-value">${item.password_length} characters</span>
+                        </div>
+                        <div class="strength-history-detail">
+                            <span class="strength-history-detail-label">User</span>
+                            <span class="strength-history-detail-value strength-history-user">${auth.currentUser.email}</span>
+                        </div>
+                    </div>
+                `;
+
+                historyList.appendChild(historyItem);
+            });
+        });
+    } catch (error) {
+        console.error('Error loading strength history:', error);
+    }
+}
+
+// Clear strength history
+async function clearStrengthHistory() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    if (confirm('Are you sure you want to clear your strength analysis history?')) {
+        try {
+            await database.ref(`users/${user.uid}/strength_history`).remove();
+            showNotification('Strength history cleared successfully', 'success');
+        } catch (error) {
+            console.error('Error clearing strength history:', error);
+            showNotification('Error clearing strength history', 'error');
         }
     }
 }
