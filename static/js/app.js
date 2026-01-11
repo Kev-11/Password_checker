@@ -1000,10 +1000,11 @@ async function analyzeAndSave() {
             const { score, level } = calculatePasswordStrength(password);
             const crackTime = estimateCrackTime(password);
             
-            const historyRef = ref(database, `users/${auth.currentUser.uid}/strength_history`);
-            const newEntryRef = push(historyRef);
+            // Use Firebase Realtime Database API
+            const historyRef = database.ref(`users/${auth.currentUser.uid}/strength_history`);
+            const newEntryRef = historyRef.push();
             
-            await set(newEntryRef, {
+            await newEntryRef.set({
                 timestamp: Date.now(),
                 strength_level: level,
                 strength_score: score,
